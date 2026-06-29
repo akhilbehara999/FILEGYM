@@ -15,6 +15,12 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-F5A623?style=for-the-badge" alt="License" /></a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/app-arm64-v8a-release.apk">
+    <img src="https://img.shields.io/badge/Download_Latest_APK-ARM64-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download Latest APK for ARM64" />
+  </a>
+</p>
+
 ---
 
 **FileGym** is a premium, local-first file utility suite for Android designed to stretch, shrink, and sculpt your files. Built with security and efficiency in mind, FileGym performs all conversion, extraction, and resizing operations **100% locally on your device**—no servers, no tracking, and zero external APIs.
@@ -45,16 +51,18 @@ FileGym does not request internet access (`android.permission.INTERNET` is omitt
 
 ## 📦 Sideloading & Installation
 
-Since FileGym is distributed directly via GitHub, you can sideload the signed release APKs on your device:
+Since FileGym is distributed directly via GitHub, you can sideload the signed release APKs directly. 
 
-1.  Navigate to the [Releases](../../releases) tab on this repository.
-2.  Choose the version corresponding to your device's CPU architecture:
-    *   **`app-arm64-v8a-release.apk`**: Recommended for all modern 64-bit Android devices.
-    *   **`app-armeabi-v7a-release.apk`**: For older 32-bit Android devices.
-    *   **`app-x86_64-release.apk`**: For Android emulators and x86-based processors.
-3.  Download and open the APK file on your mobile device.
-4.  If prompted to allow installations from unknown sources, toggle **Allow** for your browser or file manager.
-5.  Tap **Install** and open **FileGym**!
+### 📥 Direct Download Links (v1.0.0)
+*   🟢 **[Download for Modern Devices (ARM64-v8a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/app-arm64-v8a-release.apk)** — *Recommended for most phones*
+*   🔵 **[Download for Older Devices (ARMeabi-v7a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/app-armeabi-v7a-release.apk)**
+*   ⚪ **[Download for Emulators (x86_64)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/app-x86_64-release.apk)**
+
+### ⚙️ Step-by-Step Installation:
+1.  Click one of the links above to download the APK directly on your device.
+2.  Open the downloaded APK from your browser or file manager.
+3.  If prompted to allow installations from unknown sources, toggle **Allow**.
+4.  Tap **Install** and enjoy **FileGym**!
 
 ---
 
