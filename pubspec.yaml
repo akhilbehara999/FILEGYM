@@ -1,0 +1,72 @@
+name: filegym
+description: "FileGym — Your files' personal trainer. Convert, resize, compress, and stitch files with ease."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^3.3.2
+  go_router: ^17.3.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_animate: ^4.5.2
+  mime: ^2.0.0
+  path_provider: ^2.1.6
+  open_filex: ^4.7.0
+  lucide_icons: ^0.257.0
+  google_fonts: ^8.1.0
+  file_picker: ^8.1.4
+  share_plus: ^10.1.3
+  image: ^4.3.0
+  pdf: ^3.12.0
+  excel: ^4.0.6
+  archive: ^3.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
+
+# ──────────────────────────────────────────
+# App Icon Configuration
+# ──────────────────────────────────────────
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/filegym_icon.jpg"
+  adaptive_icon_background: "#0A0E2A"
+  adaptive_icon_foreground: "assets/icon/filegym_icon.jpg"
+  min_sdk_android: 21
+
+# ──────────────────────────────────────────
+# Splash Screen Configuration
+# ──────────────────────────────────────────
+flutter_native_splash:
+  color: "#0A0E2A"
+  image: "assets/icon/filegym_icon.jpg"
+  color_dark: "#090A0F"
+  image_dark: "assets/icon/filegym_icon.jpg"
+  android_12:
+    color: "#0A0E2A"
+    icon_background_color: "#0A0E2A"
+    image: "assets/icon/filegym_icon.jpg"
+    color_dark: "#090A0F"
+    icon_background_color_dark: "#090A0F"
+    image_dark: "assets/icon/filegym_icon.jpg"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon/
+
