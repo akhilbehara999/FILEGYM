@@ -54,9 +54,9 @@ FileGym does not request internet access (`android.permission.INTERNET` is omitt
 Since FileGym is distributed directly via GitHub, you can sideload the signed release APKs directly. 
 
 ### 📥 Direct Download Links (v1.0.0)
-*   🟢 **[Download for Modern Devices (ARM64-v8a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/filegym-arm64-v8a.apk)** — *Recommended for most phones*
-*   🔵 **[Download for Older Devices (ARMeabi-v7a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/filegym-armeabi-v7a.apk)**
-*   ⚪ **[Download for Emulators (x86_64)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/filegym-x86_64.apk)**
+*   🟢 **[Download for Modern Devices (ARM64-v8a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/FILEGYM.apk)** — *Recommended for most phones*
+*   🔵 **[Download for Older Devices (ARMeabi-v7a)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/filegym-release.apk)**
+*   ⚪ **[Download for Emulators (x86_64)](https://github.com/akhilbehara999/FILEGYM/releases/download/v1.0.0/filegym-v1.apk)**
 
 ### ⚙️ Step-by-Step Installation:
 1.  Click one of the links above to download the APK directly on your device.
