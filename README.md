@@ -64,6 +64,15 @@ Since FileGym is distributed directly via GitHub, you can sideload the signed re
 3.  If prompted to allow installations from unknown sources, toggle **Allow**.
 4.  Tap **Install** and enjoy **FileGym**!
 
+> [!NOTE]
+> ### 🛡️ Play Protect & Security Scans
+> Since FileGym is distributed directly via GitHub and not through the Google Play Store, your device's security system (like Google Play Protect or MIUI/HyperOS Security) may show an **"App Scan Recommended"** or **"Unknown Source"** prompt.
+> 
+> **This is standard Android behavior for all sideloaded apps.** You can safely proceed:
+> - 🔒 **Zero Internet Access**: FileGym does not request internet permission, meaning your files and data never leave your device.
+> - ⚙️ **100% Offline**: All file identification and conversions are processed locally on your phone.
+> - Let the phone scan the app; it will confirm there are no threats and finish the installation safely!
+
 ---
 
 ## 🛠️ Tech Stack & Architecture
