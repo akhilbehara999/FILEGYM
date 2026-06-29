@@ -4,9 +4,8 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/routing/app_router.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  initialThemeMode = await ThemeNotifier.loadThemeModeFromDisk();
   runApp(
     const ProviderScope(
       child: FileGymApp(),

@@ -4,12 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
-ThemeMode initialThemeMode = ThemeMode.light;
-
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
-    return initialThemeMode;
+    _loadThemeAsync();
+    return ThemeMode.light;
+  }
+
+  Future<void> _loadThemeAsync() async {
+    try {
+      final mode = await loadThemeModeFromDisk();
+      state = mode;
+    } catch (_) {}
   }
 
   static Future<ThemeMode> loadThemeModeFromDisk() async {
@@ -47,13 +53,11 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   void toggleTheme() {
     final newMode = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     state = newMode;
-    initialThemeMode = newMode;
     _saveTheme(newMode);
   }
 
   void setThemeMode(ThemeMode mode) {
     state = mode;
-    initialThemeMode = mode;
     _saveTheme(mode);
   }
 }
