@@ -104,12 +104,12 @@ class _CompressionHubScreenState extends ConsumerState<CompressionHubScreen> {
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(32),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.03),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
                     )
@@ -122,7 +122,7 @@ class _CompressionHubScreenState extends ConsumerState<CompressionHubScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -162,7 +162,7 @@ class _CompressionHubScreenState extends ConsumerState<CompressionHubScreen> {
                           child: LinearProgressIndicator(
                             value: 1.0,
                             minHeight: 6,
-                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                             valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                           ),
                         ),

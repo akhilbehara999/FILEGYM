@@ -380,7 +380,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               height: 350,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.12 : 0.05),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.12 : 0.05),
               ),
             ).animate(onPlay: (c) => c.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds),
@@ -400,7 +400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (_isProcessing)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.65),
+                color: Colors.black.withValues(alpha: 0.65),
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
@@ -408,12 +408,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       color: isDark ? const Color(0xFF141622) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: isDark ? Colors.white.withOpacity(0.08) : const Color(0xFFEAEAEE),
+                        color: isDark ? Colors.white.withValues(alpha: 0.08) : const Color(0xFFEAEAEE),
                         width: 1.5,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 35,
                           offset: const Offset(0, 15),
                         ),
@@ -454,15 +454,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       height: 76,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141622).withOpacity(0.92) : Colors.white.withOpacity(0.92),
+        color: isDark ? const Color(0xFF141622).withValues(alpha: 0.92) : Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.06) : const Color(0xFFEAEAEE),
+          color: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFEAEAEE),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -497,7 +497,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF5C00).withOpacity(0.4),
+            color: const Color(0xFFFF5C00).withValues(alpha: 0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -661,7 +661,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const Text(
                 'Universal File Converter',
                 style: TextStyle(
-                  color: const Color(0xFF70727D),
+                  color: Color(0xFF70727D),
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
                 ),
@@ -722,7 +722,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF5C00).withOpacity(0.3),
+            color: const Color(0xFFFF5C00).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -737,7 +737,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               width: 150,
               height: 150,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
             ),
@@ -749,7 +749,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
             ),
@@ -774,7 +774,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Quick import and format conversion',
-                  style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
@@ -841,7 +841,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final item = items[index];
           final color = item['color'] as Color;
@@ -855,10 +855,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+                  border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.01),
+                      color: Colors.black.withValues(alpha: 0.01),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     )
@@ -895,7 +895,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: samples.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 16),
+          separatorBuilder: (_, _) => const SizedBox(width: 16),
           itemBuilder: (context, index) {
             final sample = samples[index];
             final color = _getFormatColor(sample['target']!);
@@ -910,10 +910,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardTheme.color,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+                    border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.01),
+                        color: Colors.black.withValues(alpha: 0.01),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       )
@@ -929,7 +929,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.1),
+                              color: color.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Icon(_getFormatIcon(sample['target']!), color: color, size: 20),
@@ -937,7 +937,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.1),
+                              color: Colors.grey.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -976,7 +976,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: recentItems.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        separatorBuilder: (_, _) => const SizedBox(width: 16),
         itemBuilder: (context, index) {
           final item = recentItems[index];
           final color = _getFormatColor(item.targetFormat);
@@ -992,10 +992,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+                  border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.01),
+                      color: Colors.black.withValues(alpha: 0.01),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     )
@@ -1008,7 +1008,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(_getFormatIcon(item.targetFormat), color: color, size: 20),
@@ -1043,11 +1043,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEDEEFC)),
+          border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFEDEEFC)),
         ),
         child: Column(
           children: [
-            Icon(LucideIcons.fileQuestion, color: const Color(0xFFFF9E00).withOpacity(0.6), size: 48),
+            Icon(LucideIcons.fileQuestion, color: const Color(0xFFFF9E00).withValues(alpha: 0.6), size: 48),
             const SizedBox(height: 16),
             const Text(
               'No Conversions Yet',
@@ -1070,7 +1070,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemsToShow.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final item = itemsToShow[index];
         final color = _getFormatColor(item.targetFormat);
@@ -1081,7 +1081,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.01),
+                color: Colors.black.withValues(alpha: 0.01),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
@@ -1099,7 +1099,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Icon(_getFormatIcon(item.targetFormat), color: color, size: 24),
@@ -1121,7 +1121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.15),
+                                  color: color.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -1243,13 +1243,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isActive 
-              ? color.withOpacity(0.4) 
+              ? color.withValues(alpha: 0.4) 
               : (isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE)),
           width: isActive ? 2.0 : 1.5,
         ),
         boxShadow: isActive ? [
           BoxShadow(
-            color: color.withOpacity(0.04),
+            color: color.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           )
@@ -1272,7 +1272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.12),
+                        color: color.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(icon, color: color, size: 24),
@@ -1281,7 +1281,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: (isDark ? Colors.white : Colors.black).withOpacity(0.08),
+                          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -1314,7 +1314,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: isActive ? const Color(0xFF70727D) : Colors.grey.withOpacity(0.5),
+                        color: isActive ? const Color(0xFF70727D) : Colors.grey.withValues(alpha: 0.5),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1385,7 +1385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.searchX, size: 48, color: Colors.grey.withOpacity(0.5)),
+                        Icon(LucideIcons.searchX, size: 48, color: Colors.grey.withValues(alpha: 0.5)),
                         const SizedBox(height: 16),
                         const Text('No conversions found', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 8),
@@ -1395,7 +1395,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   )
                 : ListView.separated(
                     itemCount: filteredList.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final item = filteredList[index];
                       final color = _getFormatColor(item.targetFormat);
@@ -1421,7 +1421,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.01),
+                                color: Colors.black.withValues(alpha: 0.01),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               )
@@ -1439,7 +1439,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: color.withOpacity(0.1),
+                                        color: color.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(14),
                                       ),
                                       child: Icon(_getFormatIcon(item.targetFormat), color: color, size: 24),
@@ -1461,7 +1461,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: color.withOpacity(0.15),
+                                                  color: color.withValues(alpha: 0.15),
                                                   borderRadius: BorderRadius.circular(20),
                                                 ),
                                                 child: Text(
@@ -1785,7 +1785,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
       value: value,
       onChanged: onChanged,
-      activeColor: activeColor,
+      activeThumbColor: activeColor,
       contentPadding: EdgeInsets.zero,
     );
   }

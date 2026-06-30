@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:io' as io;
-import 'dart:typed_data';
 import 'dart:convert';
 import 'package:path/path.dart' as p;
 import 'package:image/image.dart' as img;
@@ -324,6 +322,18 @@ class FileConverter {
     final outputPath = '${tempDir.path}${Platform.pathSeparator}${baseName}_converted.$ext';
     final outputFile = File(outputPath);
 
+    final sourceLower = sourcePath.toLowerCase();
+    if (sourceLower.endsWith('.xls') || sourceLower.endsWith('.doc') || sourceLower.endsWith('.ppt')) {
+      final legacyExt = sourceLower.split('.').last;
+      throw Exception('Legacy Microsoft Office formats (.$legacyExt) are not supported. Please convert them to modern formats (.xlsx, .docx, .pptx) first.');
+    }
+
+    final isZip = bytes.length >= 4 &&
+        bytes[0] == 0x50 &&
+        bytes[1] == 0x4B &&
+        bytes[2] == 0x03 &&
+        bytes[3] == 0x04;
+
     // Perform the conversion based on target extension
     if (ext == 'pdf') {
       final pdf = pw.Document();
@@ -453,7 +463,10 @@ class FileConverter {
             },
           ),
         );
-      } else if (sourcePath.endsWith('.docx')) {
+      } else if (sourcePath.toLowerCase().endsWith('.docx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Word document. Only modern .docx files are supported.');
+        }
         final text = _extractTextFromDocx(bytes);
         pdf.addPage(
           pw.Page(
@@ -473,6 +486,9 @@ class FileConverter {
           ),
         );
       } else if (sourcePath.toLowerCase().endsWith('.pptx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy PowerPoint presentation. Only modern .pptx files are supported.');
+        }
         final slides = _extractSlidesFromPptx(bytes);
         for (int i = 0; i < slides.length; i++) {
           pdf.addPage(
@@ -493,7 +509,10 @@ class FileConverter {
             ),
           );
         }
-      } else if (sourcePath.endsWith('.xlsx')) {
+      } else if (sourcePath.toLowerCase().endsWith('.xlsx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Excel spreadsheet. Only modern .xlsx files are supported.');
+        }
         final excel = Excel.decodeBytes(bytes);
         final tableData = <List<String>>[];
         if (excel.tables.isNotEmpty) {
@@ -680,13 +699,22 @@ class FileConverter {
     }
     else if (ext == 'txt') {
       String textContent = '';
-      if (sourcePath.endsWith('.docx')) {
+      if (sourcePath.toLowerCase().endsWith('.docx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Word document. Only modern .docx files are supported.');
+        }
         textContent = _extractTextFromDocx(bytes);
-      } else if (sourcePath.endsWith('.pdf')) {
+      } else if (sourcePath.toLowerCase().endsWith('.pdf')) {
         textContent = _extractTextFromPdfBytes(bytes);
       } else if (sourcePath.toLowerCase().endsWith('.pptx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy PowerPoint presentation. Only modern .pptx files are supported.');
+        }
         textContent = _extractSlidesFromPptx(bytes).join('\n\n');
-      } else if (sourcePath.endsWith('.xlsx')) {
+      } else if (sourcePath.toLowerCase().endsWith('.xlsx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Excel spreadsheet. Only modern .xlsx files are supported.');
+        }
         final excel = Excel.decodeBytes(bytes);
         final sb = StringBuffer();
         for (final table in excel.tables.keys) {
@@ -775,15 +803,21 @@ class FileConverter {
 
       if (!convertedWithImages) {
         String text;
-        if (sourcePath.endsWith('.pdf')) {
+        if (sourcePath.toLowerCase().endsWith('.pdf')) {
           text = _extractTextFromPdfBytes(bytes);
         } else if (sourcePath.toLowerCase().endsWith('.pptx')) {
+          if (!isZip) {
+            throw Exception('Invalid or legacy PowerPoint presentation. Only modern .pptx files are supported.');
+          }
           text = _extractSlidesFromPptx(bytes).join('\n\n');
-        } else if (sourcePath.endsWith('.csv')) {
+        } else if (sourcePath.toLowerCase().endsWith('.csv')) {
           text = String.fromCharCodes(bytes);
-        } else if (sourcePath.endsWith('.txt')) {
+        } else if (sourcePath.toLowerCase().endsWith('.txt')) {
           text = String.fromCharCodes(bytes);
-        } else if (sourcePath.endsWith('.xlsx')) {
+        } else if (sourcePath.toLowerCase().endsWith('.xlsx')) {
+          if (!isZip) {
+            throw Exception('Invalid or legacy Excel spreadsheet. Only modern .xlsx files are supported.');
+          }
           final excel = Excel.decodeBytes(bytes);
           final sb = StringBuffer();
           for (final table in excel.tables.keys) {
@@ -842,13 +876,19 @@ class FileConverter {
         String text;
         if (sourcePath.toLowerCase().endsWith('.pdf')) {
           text = _extractTextFromPdfBytes(bytes);
-        } else if (sourcePath.endsWith('.csv')) {
+        } else if (sourcePath.toLowerCase().endsWith('.csv')) {
           text = String.fromCharCodes(bytes);
-        } else if (sourcePath.endsWith('.docx')) {
+        } else if (sourcePath.toLowerCase().endsWith('.docx')) {
+          if (!isZip) {
+            throw Exception('Invalid or legacy Word document. Only modern .docx files are supported.');
+          }
           text = _extractTextFromDocx(bytes);
         } else if (sourcePath.toLowerCase().endsWith('.pptx')) {
+          if (!isZip) {
+            throw Exception('Invalid or legacy PowerPoint presentation. Only modern .pptx files are supported.');
+          }
           text = _extractSlidesFromPptx(bytes).join('\n\n');
-        } else if (sourcePath.endsWith('.txt')) {
+        } else if (sourcePath.toLowerCase().endsWith('.txt')) {
           text = String.fromCharCodes(bytes);
         } else {
           text = 'Content';
@@ -921,11 +961,14 @@ class FileConverter {
         String text;
         if (sourcePath.toLowerCase().endsWith('.pdf')) {
           text = _extractTextFromPdfBytes(bytes);
-        } else if (sourcePath.endsWith('.docx')) {
+        } else if (sourcePath.toLowerCase().endsWith('.docx')) {
+          if (!isZip) {
+            throw Exception('Invalid or legacy Word document. Only modern .docx files are supported.');
+          }
           text = _extractTextFromDocx(bytes);
-        } else if (sourcePath.endsWith('.csv')) {
+        } else if (sourcePath.toLowerCase().endsWith('.csv')) {
           text = String.fromCharCodes(bytes);
-        } else if (sourcePath.endsWith('.txt')) {
+        } else if (sourcePath.toLowerCase().endsWith('.txt')) {
           text = String.fromCharCodes(bytes);
         } else {
           text = 'Slide content';
@@ -946,7 +989,10 @@ class FileConverter {
       }
     }
     else if (ext == 'csv') {
-      if (sourcePath.endsWith('.xlsx')) {
+      if (sourcePath.toLowerCase().endsWith('.xlsx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Excel spreadsheet. Only modern .xlsx files are supported.');
+        }
         final excel = Excel.decodeBytes(bytes);
         final sb = StringBuffer();
         if (excel.tables.isNotEmpty) {
@@ -1001,13 +1047,19 @@ class FileConverter {
       } else if (sourcePath.toLowerCase().endsWith('.pdf')) {
         final text = _extractTextFromPdfBytes(bytes);
         await outputFile.writeAsString(text);
-      } else if (sourcePath.endsWith('.docx')) {
+      } else if (sourcePath.toLowerCase().endsWith('.docx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Word document. Only modern .docx files are supported.');
+        }
         final text = _extractTextFromDocx(bytes);
         await outputFile.writeAsString(text);
       } else if (sourcePath.toLowerCase().endsWith('.pptx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy PowerPoint presentation. Only modern .pptx files are supported.');
+        }
         final text = _extractSlidesFromPptx(bytes).join('\n\n');
         await outputFile.writeAsString(text);
-      } else if (sourcePath.endsWith('.txt')) {
+      } else if (sourcePath.toLowerCase().endsWith('.txt')) {
         await outputFile.writeAsBytes(bytes);
       } else {
         await outputFile.writeAsBytes(bytes);
@@ -1015,7 +1067,7 @@ class FileConverter {
     }
     else if (ext == 'json') {
       String textContent = '';
-      if (sourcePath.endsWith('.csv')) {
+      if (sourcePath.toLowerCase().endsWith('.csv')) {
         final csvContent = utf8.decode(bytes);
         final lines = csvContent.split('\n').where((l) => l.trim().isNotEmpty).toList();
         if (lines.isNotEmpty) {
@@ -1037,7 +1089,10 @@ class FileConverter {
         } else {
           textContent = '[]';
         }
-      } else if (sourcePath.endsWith('.xlsx')) {
+      } else if (sourcePath.toLowerCase().endsWith('.xlsx')) {
+        if (!isZip) {
+          throw Exception('Invalid or legacy Excel spreadsheet. Only modern .xlsx files are supported.');
+        }
         final excel = Excel.decodeBytes(bytes);
         final sheetData = <String, List<Map<String, dynamic>>>{};
         for (final table in excel.tables.keys) {
@@ -1308,10 +1363,23 @@ class FileConverter {
       final documentFile = archive.findFile('word/document.xml');
       if (documentFile == null) return '';
       
-      final content = String.fromCharCodes(documentFile.content as List<int>);
-      final regex = RegExp(r'<w:t[^>]*>(.*?)</w:t>');
-      final matches = regex.allMatches(content);
-      return matches.map((m) => m.group(1) ?? '').join(' ');
+      final content = utf8.decode(documentFile.content as List<int>, allowMalformed: true);
+      
+      // Split by paragraph boundaries <w:p>...</w:p>
+      final paragraphs = <String>[];
+      final paraRegex = RegExp(r'<w:p\b[^>]*>(.*?)</w:p>', dotAll: true);
+      for (final paraMatch in paraRegex.allMatches(content)) {
+        final paraContent = paraMatch.group(1) ?? '';
+        // Extract all <w:t> text within this paragraph
+        final textRegex = RegExp(r'<w:t[^>]*>([^<]*)</w:t>');
+        final texts = textRegex.allMatches(paraContent)
+            .map((m) => m.group(1) ?? '')
+            .join('');
+        if (texts.isNotEmpty) {
+          paragraphs.add(texts);
+        }
+      }
+      return paragraphs.join('\n');
     } catch (e) {
       return 'Failed to extract text from DOCX: $e';
     }
@@ -1327,15 +1395,25 @@ class FileConverter {
       slideFiles.sort((a, b) => a.name.compareTo(b.name));
       
       for (final f in slideFiles) {
-        final content = String.fromCharCodes(f.content as List<int>);
-        final regex = RegExp(r'<a:t[^>]*>(.*?)</a:t>');
-        final matches = regex.allMatches(content);
-        final slideText = matches.map((m) => m.group(1) ?? '').join(' ');
-        slides.add(slideText.trim());
+        final content = utf8.decode(f.content as List<int>, allowMalformed: true);
+        // Extract text from <a:t> tags, grouped by <a:p> paragraphs
+        final paragraphs = <String>[];
+        final paraRegex = RegExp(r'<a:p\b[^>]*>(.*?)</a:p>', dotAll: true);
+        for (final paraMatch in paraRegex.allMatches(content)) {
+          final paraContent = paraMatch.group(1) ?? '';
+          final textRegex = RegExp(r'<a:t[^>]*>([^<]*)</a:t>');
+          final texts = textRegex.allMatches(paraContent)
+              .map((m) => m.group(1) ?? '')
+              .join('');
+          if (texts.trim().isNotEmpty) {
+            paragraphs.add(texts);
+          }
+        }
+        slides.add(paragraphs.isNotEmpty ? paragraphs.join('\n') : '(No text content on this slide)');
       }
     } catch (_) {}
     if (slides.isEmpty) {
-      slides.add('Slide Content Placeholder');
+      slides.add('(No slide content found)');
     }
     return slides;
   }

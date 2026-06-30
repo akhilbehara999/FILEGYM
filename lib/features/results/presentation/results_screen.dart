@@ -11,11 +11,15 @@ import '../../../core/utils/file_converter.dart';
 class ResultsScreen extends StatelessWidget {
   final String sourcePath;
   final String targetFormat;
+  final String originalSize;
+  final String newSize;
 
   const ResultsScreen({
     super.key,
     required this.sourcePath,
     required this.targetFormat,
+    required this.originalSize,
+    required this.newSize,
   });
 
   void _saveToDevice(BuildContext context) async {
@@ -74,7 +78,7 @@ class ResultsScreen extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       filled: true,
-                      fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEDEEFC).withOpacity(0.5),
+                      fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFEDEEFC).withValues(alpha: 0.5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -119,7 +123,9 @@ class ResultsScreen extends StatelessWidget {
         );
       }
     } catch (e) {
-      _showErrorSnackBar(context, e.toString());
+      if (context.mounted) {
+        _showErrorSnackBar(context, e.toString());
+      }
     }
   }
 
@@ -149,7 +155,9 @@ class ResultsScreen extends StatelessWidget {
         );
       }
     } catch (e) {
-      _showErrorSnackBar(context, e.toString());
+      if (context.mounted) {
+        _showErrorSnackBar(context, e.toString());
+      }
     }
   }
 
@@ -207,7 +215,7 @@ class ResultsScreen extends StatelessWidget {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.18 : 0.08),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.18 : 0.08),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 4.seconds),
@@ -220,7 +228,7 @@ class ResultsScreen extends StatelessWidget {
               height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.secondary.withOpacity(isDark ? 0.15 : 0.05),
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: isDark ? 0.15 : 0.05),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 5.seconds),
@@ -258,12 +266,12 @@ class ResultsScreen extends StatelessWidget {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 blurRadius: 40,
                 spreadRadius: -5,
               )
@@ -285,7 +293,7 @@ class ResultsScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -310,7 +318,7 @@ class ResultsScreen extends StatelessWidget {
               Text(
                 'Your file is now in $targetFormat format.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
               ),
@@ -318,20 +326,20 @@ class ResultsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEAEAEE)),
+                  border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFEAEAEE)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildSizeInfo(context, 'Original', '2.4 MB'),
+                    _buildSizeInfo(context, 'Original', originalSize),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Icon(LucideIcons.arrowRight, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                      child: Icon(LucideIcons.arrowRight, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                     ),
-                    _buildSizeInfo(context, 'New Size', '1.1 MB', highlight: true),
+                    _buildSizeInfo(context, 'New Size', newSize, highlight: true),
                   ],
                 ),
               ),
@@ -348,7 +356,7 @@ class ResultsScreen extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -395,7 +403,7 @@ class ResultsScreen extends StatelessWidget {
                   onPressed: () => _shareFile(context),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.4), width: 1.5),
+                    side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4), width: 1.5),
                     foregroundColor: Theme.of(context).colorScheme.onSurface,
                   ),
                   icon: const Icon(LucideIcons.share2),
@@ -413,8 +421,8 @@ class ResultsScreen extends StatelessWidget {
                   },
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    side: BorderSide(color: isDark ? Colors.white.withOpacity(0.15) : const Color(0xFFEAEAEE), width: 1.5),
-                    foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFFEAEAEE), width: 1.5),
+                    foregroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                   icon: const Icon(LucideIcons.rotateCcw),
                   label: const Text('Convert Another', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

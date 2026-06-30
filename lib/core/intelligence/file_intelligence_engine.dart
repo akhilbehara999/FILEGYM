@@ -177,6 +177,18 @@ class FileIntelligenceEngine {
         trueType = 'HEIC Image';
         trueMimeType = 'image/heic';
         confidence = 0.70;
+      } else if (extension == 'xls') {
+        trueType = 'Legacy Excel Spreadsheet (XLS)';
+        trueMimeType = 'application/vnd.ms-excel';
+        confidence = 0.80;
+      } else if (extension == 'doc') {
+        trueType = 'Legacy Word Document (DOC)';
+        trueMimeType = 'application/msword';
+        confidence = 0.80;
+      } else if (extension == 'ppt') {
+        trueType = 'Legacy PowerPoint Presentation (PPT)';
+        trueMimeType = 'application/vnd.ms-powerpoint';
+        confidence = 0.80;
       }
     }
  
@@ -245,8 +257,12 @@ class FileIntelligenceEngine {
  
   static bool _isSVG(List<int> bytes) {
     if (bytes.length < 5) return false;
+    // Reject ZIP magic signature (PK) early to avoid false matching on Office zip documents
+    if (bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04) {
+      return false;
+    }
     final str = String.fromCharCodes(bytes).toLowerCase();
-    return str.contains('<svg') || str.contains('<?xml');
+    return str.contains('<svg');
   }
 
   static bool _isHEIC(List<int> bytes) {
@@ -272,6 +288,9 @@ class FileIntelligenceEngine {
  
   static List<AvailableConversion> _getAvailableConversions(String trueType) {
     final t = trueType.toLowerCase();
+    if (t.contains('legacy')) {
+      return [];
+    }
     if (t.contains('pdf')) {
       return [
         AvailableConversion(format: 'DOCX', icon: LucideIcons.fileText, color: const Color(0xFFFF5C00)),

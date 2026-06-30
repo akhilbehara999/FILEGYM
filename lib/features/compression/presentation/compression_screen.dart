@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +101,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB"];
     var i = (math.log(bytes) / math.log(1024)).floor();
-    return ((bytes / math.pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    return '${(bytes / math.pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   Future<void> _startCompression() async {
@@ -295,7 +294,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.15 : 0.05),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.05),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds),
@@ -332,7 +331,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFFF5C00).withOpacity(0.1),
+                  color: const Color(0xFFFF5C00).withValues(alpha: 0.1),
                 ),
               ),
               AnimatedBuilder(
@@ -347,8 +346,8 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
                           colors: [
-                            const Color(0xFFFF5C00).withOpacity(0.0),
-                            const Color(0xFFFF5C00).withOpacity(0.5),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.0),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.5),
                           ],
                           stops: const [0.5, 1.0],
                         ),
@@ -449,7 +448,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C00).withOpacity(0.1),
+                  color: const Color(0xFFFF5C00).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(LucideIcons.fileCheck, color: Theme.of(context).colorScheme.primary, size: 28),
@@ -623,7 +622,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -650,7 +649,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
               height: 8,
               child: LinearProgressIndicator(
                 value: _progress,
-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
               ),
             ),
@@ -666,7 +665,6 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
   }
 
   Widget _buildResultsState(bool isDark) {
-    final origFileName = widget.sourceFilePath.split(Platform.pathSeparator).last;
     final sizeString = _analysisResult?.fileSize ?? '0 B';
 
     return SingleChildScrollView(
@@ -679,7 +677,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -816,48 +814,74 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
           const SizedBox(height: 12),
           
           // Download and Share buttons rows
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: SizedBox(
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _isSaved ? null : _saveToDevice,
-                    icon: Icon(_isSaved ? LucideIcons.check : LucideIcons.download, size: 20),
-                    label: Text(
-                      _isSaved ? 'Saved to Downloads' : 'Save to Downloads',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          if (!_isSaved) ...[
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: SizedBox(
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _saveToDevice,
+                      icon: const Icon(LucideIcons.download, size: 20),
+                      label: const Text(
+                        'Save to Downloads',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? const Color(0xFF141622) : const Color(0xFFEEEEF2),
+                        foregroundColor: isDark ? Colors.white : const Color(0xFF111116),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
+                      ),
                     ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  height: 56,
+                  width: 56,
+                  child: ElevatedButton(
+                    onPressed: _shareFile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDark ? const Color(0xFF141622) : const Color(0xFFEEEEF2),
                       foregroundColor: isDark ? Colors.white : const Color(0xFF111116),
-                      disabledBackgroundColor: const Color(0xFF10B981).withOpacity(0.2),
-                      disabledForegroundColor: const Color(0xFF10B981),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       elevation: 0,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Icon(LucideIcons.share2, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.checkCircle, color: Colors.green),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Saved as $_savedFileName',
+                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                height: 56,
-                width: 56,
-                child: ElevatedButton(
-                  onPressed: _shareFile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? const Color(0xFF141622) : const Color(0xFFEEEEF2),
-                    foregroundColor: isDark ? Colors.white : const Color(0xFF111116),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    elevation: 0,
-                    padding: EdgeInsets.zero,
+                  const SizedBox(width: 12),
+                  IconButton(
+                    icon: const Icon(LucideIcons.share2, color: Colors.green),
+                    onPressed: _shareFile,
                   ),
-                  child: const Icon(LucideIcons.share2, size: 20),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),
@@ -883,7 +907,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5), width: 1.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -893,7 +917,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(LucideIcons.fileArchive, color: Theme.of(context).colorScheme.primary, size: 22),
@@ -912,7 +936,7 @@ class _CompressionScreenState extends ConsumerState<CompressionScreen> with Sing
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Text(

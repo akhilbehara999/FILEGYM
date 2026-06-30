@@ -84,7 +84,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB"];
     var i = (math.log(bytes) / math.log(1024)).floor();
-    return ((bytes / math.pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    return '${(bytes / math.pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   String _getTotalSize() {
@@ -323,7 +323,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: themeColor.withOpacity(isDark ? 0.15 : 0.05),
+                color: themeColor.withValues(alpha: isDark ? 0.15 : 0.05),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds),
@@ -361,7 +361,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
                     return CircularProgressIndicator(
                       value: value,
                       strokeWidth: 12,
-                      backgroundColor: themeColor.withOpacity(0.1),
+                      backgroundColor: themeColor.withValues(alpha: 0.1),
                       color: themeColor,
                       strokeCap: StrokeCap.round,
                     );
@@ -386,7 +386,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
           Text(
             _statusMessage,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,
                 ),
           ).animate(key: ValueKey(_statusMessage)).fade().slideY(begin: 0.2, end: 0),
@@ -414,7 +414,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFF5C00).withOpacity(0.4),
+                    color: const Color(0xFFFF5C00).withValues(alpha: 0.4),
                     blurRadius: 16,
                   ),
                 ],
@@ -564,7 +564,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDark ? const Color(0xFF141622) : const Color(0xFFEEEEF2),
                       foregroundColor: isDark ? Colors.white : const Color(0xFF111116),
-                      disabledBackgroundColor: const Color(0xFF10B981).withOpacity(0.2),
+                      disabledBackgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
                       disabledForegroundColor: const Color(0xFF10B981),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       elevation: 0,
@@ -664,7 +664,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
                                             width: 50,
                                             height: 50,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Icon(LucideIcons.image, color: themeColor, size: 24),
+                                            errorBuilder: (_, _, _) => Icon(LucideIcons.image, color: themeColor, size: 24),
                                           ),
                                   ),
                                 ),
@@ -838,7 +838,7 @@ class _ImgToPdfScreenState extends ConsumerState<ImgToPdfScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: themeColor.withOpacity(0.1),
+              color: themeColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(LucideIcons.image, color: themeColor, size: 40),

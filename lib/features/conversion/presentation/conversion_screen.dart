@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/history/history_provider.dart';
-import '../../../core/config/config_provider.dart';
 import '../../../core/utils/file_converter.dart';
 import '../../../core/intelligence/analysis_result.dart';
 import '../../../core/intelligence/file_intelligence_engine.dart';
@@ -103,7 +101,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB"];
     var i = (math.log(bytes) / math.log(1024)).floor();
-    return ((bytes / math.pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    return '${(bytes / math.pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   Future<void> _startConversion() async {
@@ -134,7 +132,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
           if (i < 30) {
             _statusMessage = 'Reading source file...';
           } else if (i < 75) {
-            _statusMessage = 'Converting to ${_selectedTargetFormat}...';
+            _statusMessage = 'Converting to $_selectedTargetFormat...';
           } else {
             _statusMessage = 'Packaging output bytes...';
           }
@@ -305,7 +303,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.15 : 0.05),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.05),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds),
@@ -350,7 +348,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFFF5C00).withOpacity(0.1),
+                  color: const Color(0xFFFF5C00).withValues(alpha: 0.1),
                 ),
               ),
               AnimatedBuilder(
@@ -365,8 +363,8 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
                           colors: [
-                            const Color(0xFFFF5C00).withOpacity(0.0),
-                            const Color(0xFFFF5C00).withOpacity(0.5),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.0),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.5),
                           ],
                           stops: const [0.5, 1.0],
                         ),
@@ -472,7 +470,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C00).withOpacity(0.1),
+                  color: const Color(0xFFFF5C00).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(LucideIcons.fileCheck, color: Theme.of(context).colorScheme.primary, size: 28),
@@ -516,52 +514,77 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
         ),
         const SizedBox(height: 12),
         
-        // Horizontal Chip list of available conversions
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: result.availableConversions.map((conv) {
-            final isSelected = _selectedTargetFormat == conv.format;
-            return InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedTargetFormat = conv.format;
-                });
-              },
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardTheme.color,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected ? Theme.of(context).colorScheme.primary : (isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE)),
-                    width: 1.5,
+         // Horizontal Chip list of available conversions
+        if (result.availableConversions.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.alertTriangle, color: Colors.red),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    result.trueType.toLowerCase().contains('legacy')
+                        ? 'Legacy Microsoft Office formats are not supported. Please save the document as a modern XML-based format (.docx, .xlsx, .pptx) first.'
+                        : 'No conversions available for this file type.',
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      conv.icon, 
-                      color: isSelected ? Colors.white : conv.color, 
-                      size: 16
+              ],
+            ),
+          )
+        else
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: result.availableConversions.map((conv) {
+              final isSelected = _selectedTargetFormat == conv.format;
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedTargetFormat = conv.format;
+                  });
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? Theme.of(context).colorScheme.primary : (isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE)),
+                      width: 1.5,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      conv.format,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : (isDark ? Colors.white : const Color(0xFF111116)),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        conv.icon, 
+                        color: isSelected ? Colors.white : conv.color, 
+                        size: 16
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(
+                        conv.format,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : (isDark ? Colors.white : const Color(0xFF111116)),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
+              );
+            }).toList(),
+          ),
         
         const SizedBox(height: 28),
 
@@ -581,12 +604,15 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
           width: double.infinity,
           height: 64,
           child: ElevatedButton.icon(
-            onPressed: _startConversion,
+            onPressed: _selectedTargetFormat != null ? _startConversion : null,
             icon: const Icon(LucideIcons.zap),
-            label: const Text('Convert Now', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+            label: Text(
+              result.availableConversions.isEmpty ? 'Unsupported Format' : 'Convert Now',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: _selectedTargetFormat != null ? Theme.of(context).colorScheme.primary : Colors.grey.withValues(alpha: 0.3),
+              foregroundColor: _selectedTargetFormat != null ? Colors.white : Colors.grey,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               elevation: 0,
             ),
@@ -650,7 +676,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                     return CircularProgressIndicator(
                       value: value,
                       strokeWidth: 12,
-                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                       color: Theme.of(context).colorScheme.primary,
                       strokeCap: StrokeCap.round,
                     );
@@ -675,7 +701,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
           Text(
             _statusMessage,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,
                 ),
           ).animate(key: ValueKey(_statusMessage)).fade().slideY(begin: 0.2, end: 0),
@@ -698,12 +724,12 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
               color: Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                   blurRadius: 30,
                   spreadRadius: -5,
                 )
@@ -722,7 +748,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF5C00).withOpacity(0.4),
+                        color: const Color(0xFFFF5C00).withValues(alpha: 0.4),
                         blurRadius: 16,
                       ),
                     ],
@@ -752,9 +778,9 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEAEAEE)),
+                    border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFEAEAEE)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -763,7 +789,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                       _buildSizeLabel('Original', origSizeStr),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Icon(LucideIcons.arrowRight, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                        child: Icon(LucideIcons.arrowRight, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                       ),
                       _buildSizeLabel('New Size', _newSizeString, highlight: true),
                     ],
@@ -806,7 +832,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     filled: true,
-                    fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFEDEEFC).withOpacity(0.5),
+                    fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFEDEEFC).withValues(alpha: 0.5),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -891,9 +917,9 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -921,7 +947,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                     onPressed: _shareFile,
                     style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.4), width: 1.5),
+                      side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4), width: 1.5),
                       foregroundColor: Theme.of(context).colorScheme.primary,
                     ),
                     icon: const Icon(LucideIcons.share2),
@@ -937,7 +963,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                     onPressed: () => context.go('/'),
                     style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      side: BorderSide(color: isDark ? Colors.white.withOpacity(0.15) : const Color(0xFFEAEAEE), width: 1.5),
+                      side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFFEAEAEE), width: 1.5),
                       foregroundColor: isDark ? Colors.white70 : Colors.black87,
                     ),
                     icon: const Icon(LucideIcons.rotateCcw),
@@ -960,7 +986,7 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 fontWeight: FontWeight.w700,
               ),
         ),

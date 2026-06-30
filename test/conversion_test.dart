@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
@@ -371,6 +373,54 @@ Normal paragraph text.''');
       if (await pngInputFile.exists()) {
         await pngInputFile.delete();
       }
+    }
+  });
+
+  test('Legacy Office formats rejection test', () async {
+    final tempDir = Directory.systemTemp;
+    final xlsFile = File('${tempDir.path}/test_legacy.xls');
+    final docFile = File('${tempDir.path}/test_legacy.doc');
+    final pptFile = File('${tempDir.path}/test_legacy.ppt');
+
+    await xlsFile.writeAsBytes([1, 2, 3]);
+    await docFile.writeAsBytes([1, 2, 3]);
+    await pptFile.writeAsBytes([1, 2, 3]);
+
+    try {
+      await expectLater(
+        FileConverter.convert(sourcePath: xlsFile.path, targetFormat: 'pdf'),
+        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Legacy Microsoft Office formats (.xls) are not supported'))),
+      );
+
+      await expectLater(
+        FileConverter.convert(sourcePath: docFile.path, targetFormat: 'pdf'),
+        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Legacy Microsoft Office formats (.doc) are not supported'))),
+      );
+
+      await expectLater(
+        FileConverter.convert(sourcePath: pptFile.path, targetFormat: 'pdf'),
+        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Legacy Microsoft Office formats (.ppt) are not supported'))),
+      );
+    } finally {
+      if (await xlsFile.exists()) await xlsFile.delete();
+      if (await docFile.exists()) await docFile.delete();
+      if (await pptFile.exists()) await pptFile.delete();
+    }
+  });
+
+  test('Zip signature validation test for DOCX, XLSX, PPTX', () async {
+    final tempDir = Directory.systemTemp;
+    final fakeDocxFile = File('${tempDir.path}/fake.docx');
+    // Not a zip file, just plain text
+    await fakeDocxFile.writeAsString('This is not a zip file');
+
+    try {
+      await expectLater(
+        FileConverter.convert(sourcePath: fakeDocxFile.path, targetFormat: 'pdf'),
+        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Only modern .docx files are supported'))),
+      );
+    } finally {
+      if (await fakeDocxFile.exists()) await fakeDocxFile.delete();
     }
   });
 }

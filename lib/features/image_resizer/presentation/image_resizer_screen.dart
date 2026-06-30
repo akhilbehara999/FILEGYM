@@ -135,7 +135,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB"];
     var i = (math.log(bytes) / math.log(1024)).floor();
-    return ((bytes / math.pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    return '${(bytes / math.pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   void _applyPreset(double scale) {
@@ -381,7 +381,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? primaryColor.withOpacity(0.08)
+              ? primaryColor.withValues(alpha: 0.08)
               : (isDark ? const Color(0xFF141622) : const Color(0xFFF6F7F9)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
@@ -396,7 +396,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? primaryColor.withOpacity(0.15) : (isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE)),
+                color: isSelected ? primaryColor.withValues(alpha: 0.15) : (isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE)),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: isSelected ? primaryColor : (isDark ? Colors.white70 : Colors.black87), size: 22),
@@ -461,7 +461,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
               height: 350,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.12 : 0.05),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.12 : 0.05),
               ),
             ).animate(onPlay: (c) => c.repeat(reverse: true))
              .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 6.seconds),
@@ -500,7 +500,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFFF5C00).withOpacity(0.1),
+                  color: const Color(0xFFFF5C00).withValues(alpha: 0.1),
                 ),
               ),
               AnimatedBuilder(
@@ -515,8 +515,8 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
                           colors: [
-                            const Color(0xFFFF5C00).withOpacity(0.0),
-                            const Color(0xFFFF5C00).withOpacity(0.5),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.0),
+                            const Color(0xFFFF5C00).withValues(alpha: 0.5),
                           ],
                           stops: const [0.5, 1.0],
                         ),
@@ -567,7 +567,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -592,7 +592,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
             child: LinearProgressIndicator(
               value: _progress,
               minHeight: 8,
-              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             ),
           ),
@@ -633,7 +633,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     )
@@ -813,7 +813,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
               border: Border.all(color: isDark ? const Color(0xFF222431) : const Color(0xFFEAEAEE), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.03),
+                  color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 )
@@ -824,7 +824,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -1109,7 +1109,7 @@ class _ImageResizerScreenState extends ConsumerState<ImageResizerScreen> with Si
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isDark ? const Color(0xFF141622) : const Color(0xFFEEEEF2),
                     foregroundColor: isDark ? Colors.white : const Color(0xFF111116),
-                    disabledBackgroundColor: const Color(0xFF10B981).withOpacity(0.2),
+                    disabledBackgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
                     disabledForegroundColor: const Color(0xFF10B981),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     elevation: 0,
