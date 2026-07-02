@@ -859,14 +859,48 @@ class _ConversionScreenState extends ConsumerState<ConversionScreen> with Single
                   try {
                     final ext = (_selectedTargetFormat ?? '').toLowerCase();
                     String? mimeType;
-                    if (ext == 'pdf') {
-                      mimeType = 'application/pdf';
-                    } else if (ext == 'png') {
-                      mimeType = 'image/png';
-                    } else if (ext == 'jpg' || ext == 'jpeg') {
-                      mimeType = 'image/jpeg';
-                    } else if (ext == 'webp') {
-                      mimeType = 'image/webp';
+                    switch (ext) {
+                      case 'pdf':
+                        mimeType = 'application/pdf';
+                        break;
+                      case 'png':
+                        mimeType = 'image/png';
+                        break;
+                      case 'jpg':
+                      case 'jpeg':
+                        mimeType = 'image/jpeg';
+                        break;
+                      case 'webp':
+                        mimeType = 'image/webp';
+                        break;
+                      case 'heic':
+                      case 'heif':
+                        mimeType = 'image/heic';
+                        break;
+                      case 'ico':
+                        mimeType = 'image/x-icon';
+                        break;
+                      case 'svg':
+                        mimeType = 'image/svg+xml';
+                        break;
+                      case 'docx':
+                        mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                        break;
+                      case 'xlsx':
+                        mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                        break;
+                      case 'pptx':
+                        mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+                        break;
+                      case 'csv':
+                        mimeType = 'text/csv';
+                        break;
+                      case 'json':
+                        mimeType = 'application/json';
+                        break;
+                      case 'txt':
+                        mimeType = 'text/plain';
+                        break;
                     }
                     await OpenFilex.open(_outputPath!, type: mimeType);
                   } catch (e) {

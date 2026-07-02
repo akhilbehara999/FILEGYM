@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:mime/mime.dart';
+import 'package:archive/archive.dart';
 
 import 'analysis_result.dart';
 
@@ -122,22 +123,77 @@ class FileIntelligenceEngine {
       trueMimeType = 'application/zip';
       confidence = 0.90;
       
-      if (extension == 'docx') {
-        trueType = 'Word Document (DOCX)';
-        trueMimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        confidence = 0.95;
-      } else if (extension == 'xlsx') {
-        trueType = 'Excel Spreadsheet (XLSX)';
-        trueMimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        confidence = 0.95;
-      } else if (extension == 'pptx') {
-        trueType = 'PowerPoint Presentation (PPTX)';
-        trueMimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-        confidence = 0.95;
-      } else if (extension == 'apk') {
-        trueType = 'Android Package (APK)';
-        trueMimeType = 'application/vnd.android.package-archive';
-        confidence = 0.95;
+      try {
+        final zipBytes = await file.readAsBytes();
+        final archive = ZipDecoder().decodeBytes(zipBytes);
+        bool isWord = false;
+        bool isExcel = false;
+        bool isPptx = false;
+        for (final f in archive.files) {
+          var name = f.name.replaceAll('\\', '/').toLowerCase();
+          if (name.startsWith('/')) name = name.substring(1);
+          if (name == 'word/document.xml') {
+            isWord = true;
+            break;
+          } else if (name == 'xl/workbook.xml') {
+            isExcel = true;
+            break;
+          } else if (name == 'ppt/presentation.xml') {
+            isPptx = true;
+            break;
+          }
+        }
+        if (isWord) {
+          trueType = 'Word Document (DOCX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          confidence = 0.99;
+          if (extension != 'docx') {
+            anomalyWarning = 'Extension mismatch. File claims to be .$extension but is actually a Word Document.';
+            confidence = 0.85;
+          }
+        } else if (isExcel) {
+          trueType = 'Excel Spreadsheet (XLSX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          confidence = 0.99;
+          if (extension != 'xlsx') {
+            anomalyWarning = 'Extension mismatch. File claims to be .$extension but is actually an Excel Spreadsheet.';
+            confidence = 0.85;
+          }
+        } else if (isPptx) {
+          trueType = 'PowerPoint Presentation (PPTX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+          confidence = 0.99;
+          if (extension != 'pptx') {
+            anomalyWarning = 'Extension mismatch. File claims to be .$extension but is actually a PowerPoint Presentation.';
+            confidence = 0.85;
+          }
+        } else if (extension == 'apk' || archive.files.any((f) => f.name == 'AndroidManifest.xml')) {
+          trueType = 'Android Package (APK)';
+          trueMimeType = 'application/vnd.android.package-archive';
+          confidence = 0.95;
+          if (extension != 'apk') {
+            anomalyWarning = 'Extension mismatch. File claims to be .$extension but is actually an Android Package (APK).';
+            confidence = 0.85;
+          }
+        }
+      } catch (_) {
+        if (extension == 'docx') {
+          trueType = 'Word Document (DOCX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+          confidence = 0.95;
+        } else if (extension == 'xlsx') {
+          trueType = 'Excel Spreadsheet (XLSX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          confidence = 0.95;
+        } else if (extension == 'pptx') {
+          trueType = 'PowerPoint Presentation (PPTX)';
+          trueMimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+          confidence = 0.95;
+        } else if (extension == 'apk') {
+          trueType = 'Android Package (APK)';
+          trueMimeType = 'application/vnd.android.package-archive';
+          confidence = 0.95;
+        }
       }
     } else {
       // Fallback to extension if magic bytes are unknown

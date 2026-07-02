@@ -320,11 +320,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         case 'webp':
           mimeType = 'image/webp';
           break;
+        case 'heic':
+        case 'heif':
+          mimeType = 'image/heic';
+          break;
+        case 'ico':
+          mimeType = 'image/x-icon';
+          break;
+        case 'svg':
+          mimeType = 'image/svg+xml';
+          break;
         case 'zip':
           mimeType = 'application/zip';
           break;
         case 'csv':
           mimeType = 'text/csv';
+          break;
+        case 'json':
+          mimeType = 'application/json';
           break;
         case 'txt':
           mimeType = 'text/plain';

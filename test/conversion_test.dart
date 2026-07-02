@@ -9,6 +9,10 @@ import 'package:archive/archive.dart';
 import 'dart:convert';
 import 'package:image/image.dart' as img;
 import 'package:filegym/core/intelligence/file_intelligence_engine.dart';
+import 'package:excel/excel.dart';
+
+import 'package:filegym/core/utils/builders/docx_archive_builder.dart';
+import 'package:filegym/core/utils/extractors/pdf_text_extractor.dart';
 
 void main() {
   test('PDF to PPTX conversion test', () async {
@@ -423,4 +427,409 @@ Normal paragraph text.''');
       if (await fakeDocxFile.exists()) await fakeDocxFile.delete();
     }
   });
+
+  test('XLSX to PDF conversion test', () async {
+    final tempDir = Directory.systemTemp;
+    final jsonFile = File('${tempDir.path}/xlsx_test_data.json');
+    final data = [
+      {'name': 'Alice', 'age': '30'},
+      {'name': 'Bob', 'age': '25'},
+    ];
+    await jsonFile.writeAsString(json.encode(data));
+
+    try {
+      // 1. Convert JSON to XLSX
+      final xlsxPath = await FileConverter.convert(
+        sourcePath: jsonFile.path,
+        targetFormat: 'xlsx',
+      );
+      final xlsxFile = File(xlsxPath);
+      expect(await xlsxFile.exists(), isTrue);
+
+      // Print cell values to see what toString() returns
+      final excelBytes = await xlsxFile.readAsBytes();
+      final excel = Excel.decodeBytes(excelBytes);
+      if (excel.tables.isNotEmpty) {
+        final sheet = excel.tables.values.first;
+        for (final row in sheet.rows) {
+          for (final cell in row) {
+            print('Cell value: ${cell?.value} | toString(): ${cell?.value?.toString()} | runtimeType: ${cell?.value.runtimeType}');
+          }
+        }
+      }
+
+      // 2. Convert XLSX to PDF
+      final pdfPath = await FileConverter.convert(
+        sourcePath: xlsxPath,
+        targetFormat: 'pdf',
+      );
+      final pdfFile = File(pdfPath);
+      expect(await pdfFile.exists(), isTrue);
+      print('XLSX to PDF successful, output: $pdfPath');
+
+      await xlsxFile.delete();
+      await pdfFile.delete();
+    } catch (e, stackTrace) {
+      print('XLSX to PDF failed with error: $e');
+      print('StackTrace: $stackTrace');
+      rethrow;
+    } finally {
+      if (await jsonFile.exists()) {
+        await jsonFile.delete();
+      }
+    }
+  });
+
+  test('Large XLSX to PDF conversion test (100 rows)', () async {
+    final tempDir = Directory.systemTemp;
+    final jsonFile = File('${tempDir.path}/xlsx_large_test_data.json');
+    final data = List.generate(100, (i) => {'index': '$i', 'name': 'User $i', 'value': 'Value $i'});
+    await jsonFile.writeAsString(json.encode(data));
+
+    try {
+      // 1. Convert JSON to XLSX
+      final xlsxPath = await FileConverter.convert(
+        sourcePath: jsonFile.path,
+        targetFormat: 'xlsx',
+      );
+      final xlsxFile = File(xlsxPath);
+      expect(await xlsxFile.exists(), isTrue);
+
+      // 2. Convert XLSX to PDF
+      final pdfPath = await FileConverter.convert(
+        sourcePath: xlsxPath,
+        targetFormat: 'pdf',
+      );
+      final pdfFile = File(pdfPath);
+      expect(await pdfFile.exists(), isTrue);
+      print('Large XLSX to PDF successful, output: $pdfPath');
+
+      await xlsxFile.delete();
+      await pdfFile.delete();
+    } catch (e, stackTrace) {
+      print('Large XLSX to PDF failed with error: $e');
+      print('StackTrace: $stackTrace');
+      rethrow;
+    } finally {
+      if (await jsonFile.exists()) {
+        await jsonFile.delete();
+      }
+    }
+  });
+
+  test('Varying row lengths XLSX to PDF conversion test', () async {
+    final tempDir = Directory.systemTemp;
+    final xlsxFile = File('${tempDir.path}/xlsx_varying_rows.xlsx');
+    
+    final excel = Excel.createExcel();
+    final sheet = excel.sheets[excel.sheets.keys.first]!;
+    
+    // Row 0 has 3 cells
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0)).value = TextCellValue('Header1');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 0)).value = TextCellValue('Header2');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 0)).value = TextCellValue('Header3');
+    
+    // Row 1 has 2 cells
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 1)).value = TextCellValue('Val1');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 1)).value = TextCellValue('Val2');
+    
+    // Row 2 has 4 cells
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 2)).value = TextCellValue('A');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 2)).value = TextCellValue('B');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 2)).value = TextCellValue('C');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 2)).value = TextCellValue('D');
+
+    final excelBytes = excel.encode();
+    await xlsxFile.writeAsBytes(excelBytes!);
+
+    try {
+      final pdfPath = await FileConverter.convert(
+        sourcePath: xlsxFile.path,
+        targetFormat: 'pdf',
+      );
+      final pdfFile = File(pdfPath);
+      expect(await pdfFile.exists(), isTrue);
+      print('Varying row lengths XLSX to PDF successful!');
+      await pdfFile.delete();
+    } catch (e, stackTrace) {
+      print('Varying row lengths XLSX to PDF failed with error: $e');
+      print('StackTrace: $stackTrace');
+      rethrow;
+    } finally {
+      if (await xlsxFile.exists()) {
+        await xlsxFile.delete();
+      }
+    }
+  });
+
+  test('Print CellValue types', () {
+    print('TextCellValue: ${TextCellValue('Hello')} | toString: ${TextCellValue('Hello').toString()}');
+    print('IntCellValue: ${IntCellValue(123)} | toString: ${IntCellValue(123).toString()}');
+    print('DoubleCellValue: ${DoubleCellValue(12.34)} | toString: ${DoubleCellValue(12.34).toString()}');
+    print('BoolCellValue: ${BoolCellValue(true)} | toString: ${BoolCellValue(true).toString()}');
+  });
+
+  test('XLSX to CSV and JSON robust conversions with empty leading rows, varying lengths, and duplicate headers', () async {
+    final tempDir = Directory.systemTemp;
+    final xlsxFile = File('${tempDir.path}/xlsx_robust_test.xlsx');
+    
+    final excel = Excel.createExcel();
+    final sheet = excel.sheets[excel.sheets.keys.first]!;
+    
+    // Rows 0 and 1 are completely empty
+    
+    // Row 2 is the header row, containing duplicate names and empty cells
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 2)).value = TextCellValue('Name');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 2)).value = TextCellValue('Age');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 2)).value = TextCellValue('Name'); // Duplicate
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 2)).value = TextCellValue(''); // Empty header
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 2)).value = TextCellValue('Role');
+
+    // Row 3 is a data row with fewer elements
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 3)).value = TextCellValue('Alice');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 3)).value = IntCellValue(30);
+
+    // Row 4 is a data row with all elements
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 4)).value = TextCellValue('Bob');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 4)).value = IntCellValue(25);
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 4)).value = TextCellValue('Bobby');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 4)).value = TextCellValue('Val');
+    sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 4)).value = TextCellValue('Developer');
+
+    final excelBytes = excel.encode();
+    await xlsxFile.writeAsBytes(excelBytes!);
+
+    try {
+      // 1. XLSX to CSV
+      final csvPath = await FileConverter.convert(
+        sourcePath: xlsxFile.path,
+        targetFormat: 'csv',
+      );
+      final csvFile = File(csvPath);
+      expect(await csvFile.exists(), isTrue);
+      
+      final csvContent = await csvFile.readAsString();
+      print('CSV Output:\n$csvContent');
+      
+      final csvLines = csvContent.split('\n').where((l) => l.isNotEmpty).toList();
+      // Ensure all rows are padded to the maximum column count (5 columns)
+      for (final line in csvLines) {
+        expect(line.split(',').length, 5);
+      }
+      expect(csvLines[2], 'Name,Age,Name,,Role');
+      expect(csvLines[3], 'Alice,30,,,');
+
+      // 2. XLSX to JSON
+      final jsonPath = await FileConverter.convert(
+        sourcePath: xlsxFile.path,
+        targetFormat: 'json',
+      );
+      final jsonFile = File(jsonPath);
+      expect(await jsonFile.exists(), isTrue);
+
+      final jsonContent = await jsonFile.readAsString();
+      print('JSON Output:\n$jsonContent');
+
+      final jsonDecoded = json.decode(jsonContent) as Map<String, dynamic>;
+      final firstSheetData = jsonDecoded.values.first as List;
+      
+      expect(firstSheetData.length, 2);
+      
+      // Check resolved headers (duplicate Name becomes Name_2, empty becomes Column_4)
+      final aliceObj = firstSheetData[0] as Map<String, dynamic>;
+      expect(aliceObj.containsKey('Name'), isTrue);
+      expect(aliceObj.containsKey('Name_2'), isTrue);
+      expect(aliceObj.containsKey('Column_4'), isTrue);
+      expect(aliceObj['Name'], 'Alice');
+      expect(aliceObj['Age'], '30');
+      expect(aliceObj['Name_2'], '');
+      expect(aliceObj['Column_4'], '');
+      expect(aliceObj['Role'], '');
+
+      final bobObj = firstSheetData[1] as Map<String, dynamic>;
+      expect(bobObj['Name'], 'Bob');
+      expect(bobObj['Age'], '25');
+      expect(bobObj['Name_2'], 'Bobby');
+      expect(bobObj['Column_4'], 'Val');
+      expect(bobObj['Role'], 'Developer');
+
+      await csvFile.delete();
+      await jsonFile.delete();
+    } finally {
+      if (await xlsxFile.exists()) {
+        await xlsxFile.delete();
+      }
+    }
+  });
+
+  test('DOCX to PDF and DOCX to TXT conversion', () async {
+    final tempDir = Directory.systemTemp;
+    final docxFile = File('${tempDir.path}/test_doc.docx');
+    
+    // Build a text-only DOCX archive
+    final archive = Archive();
+    DocxArchiveBuilder.createDocxArchive(archive, 'Hello from Docx Converter\nSecond Line of text');
+    final bytes = ZipEncoder().encode(archive);
+    await docxFile.writeAsBytes(Uint8List.fromList(bytes!));
+
+    try {
+      // Test DOCX to TXT
+      final txtPath = await FileConverter.convert(
+        sourcePath: docxFile.path,
+        targetFormat: 'txt',
+      );
+      final txtFile = File(txtPath);
+      expect(await txtFile.exists(), isTrue);
+      final txtContent = await txtFile.readAsString();
+      expect(txtContent, contains('Hello from Docx Converter'));
+      expect(txtContent, contains('Second Line of text'));
+      await txtFile.delete();
+
+      // Test DOCX to PDF
+      final pdfPath = await FileConverter.convert(
+        sourcePath: docxFile.path,
+        targetFormat: 'pdf',
+      );
+      final pdfFile = File(pdfPath);
+      expect(await pdfFile.exists(), isTrue);
+      final pdfBytes = await pdfFile.readAsBytes();
+      final pdfText = PdfTextExtractor.extractText(pdfBytes);
+      expect(pdfText, contains('Hello from Docx Converter'));
+      expect(pdfText, contains('Second Line of text'));
+      await pdfFile.delete();
+    } finally {
+      if (await docxFile.exists()) {
+        await docxFile.delete();
+      }
+    }
+  });
+
+  test('Robust content type detection for uppercase/mixed-case and extensionless files', () async {
+    final tempDir = Directory.systemTemp;
+
+    // 1. Prepare valid zip bytes for a minimal docx file
+    final archiveDocx = Archive();
+    DocxArchiveBuilder.createDocxArchive(archiveDocx, 'Robust Docx Content');
+    final docxBytes = Uint8List.fromList(ZipEncoder().encode(archiveDocx)!);
+
+    // Save with mixed case extension (.DoCx)
+    final docxMixedFile = File('${tempDir.path}/test_mixed.DoCx');
+    await docxMixedFile.writeAsBytes(docxBytes);
+
+    // Save with no extension (just 'docx_raw')
+    final docxNoExtFile = File('${tempDir.path}/docx_raw');
+    await docxNoExtFile.writeAsBytes(docxBytes);
+
+    // 2. Prepare JSON bytes
+    final jsonBytes = utf8.encode(json.encode([{'header': 'json_val'}]));
+    // Save with mixed case (.JsOn) and no extension
+    final jsonMixedFile = File('${tempDir.path}/test_mixed.JsOn');
+    await jsonMixedFile.writeAsBytes(jsonBytes);
+    final jsonNoExtFile = File('${tempDir.path}/json_raw');
+    await jsonNoExtFile.writeAsBytes(jsonBytes);
+
+    // 3. Prepare CSV bytes
+    final csvBytes = utf8.encode('header,value\ncsv_val_1,csv_val_2');
+    // Save with mixed case (.CsV) and no extension
+    final csvMixedFile = File('${tempDir.path}/test_mixed.CsV');
+    await csvMixedFile.writeAsBytes(csvBytes);
+    final csvNoExtFile = File('${tempDir.path}/csv_raw');
+    await csvNoExtFile.writeAsBytes(csvBytes);
+
+    try {
+      // Test mixed case DOCX -> TXT
+      final docxTxtMixedPath = await FileConverter.convert(
+        sourcePath: docxMixedFile.path,
+        targetFormat: 'txt',
+      );
+      expect(await File(docxTxtMixedPath).readAsString(), contains('Robust Docx Content'));
+
+      // Test extension-less DOCX -> TXT
+      final docxTxtNoExtPath = await FileConverter.convert(
+        sourcePath: docxNoExtFile.path,
+        targetFormat: 'txt',
+      );
+      expect(await File(docxTxtNoExtPath).readAsString(), contains('Robust Docx Content'));
+
+      // Test mixed case JSON -> XLSX
+      final jsonXlsxMixedPath = await FileConverter.convert(
+        sourcePath: jsonMixedFile.path,
+        targetFormat: 'xlsx',
+      );
+      expect(await File(jsonXlsxMixedPath).exists(), isTrue);
+
+      // Test extension-less JSON -> XLSX
+      final jsonXlsxNoExtPath = await FileConverter.convert(
+        sourcePath: jsonNoExtFile.path,
+        targetFormat: 'xlsx',
+      );
+      expect(await File(jsonXlsxNoExtPath).exists(), isTrue);
+
+      // Test mixed case CSV -> PDF
+      final csvPdfMixedPath = await FileConverter.convert(
+        sourcePath: csvMixedFile.path,
+        targetFormat: 'pdf',
+      );
+      expect(await File(csvPdfMixedPath).exists(), isTrue);
+
+      // Test extension-less CSV -> PDF
+      final csvPdfNoExtPath = await FileConverter.convert(
+        sourcePath: csvNoExtFile.path,
+        targetFormat: 'pdf',
+      );
+      expect(await File(csvPdfNoExtPath).exists(), isTrue);
+
+    } finally {
+      if (await docxMixedFile.exists()) await docxMixedFile.delete();
+      if (await docxNoExtFile.exists()) await docxNoExtFile.delete();
+      if (await jsonMixedFile.exists()) await jsonMixedFile.delete();
+      if (await jsonNoExtFile.exists()) await jsonNoExtFile.delete();
+      if (await csvMixedFile.exists()) await csvMixedFile.delete();
+      if (await csvNoExtFile.exists()) await csvNoExtFile.delete();
+    }
+  });
+
+  test('ZIP entries path normalization with leading slashes and backslashes', () async {
+    final tempDir = Directory.systemTemp;
+
+    // 1. Word ZIP with leading slash
+    final archiveDoc = Archive();
+    archiveDoc.addFile(ArchiveFile('/word/document.xml', 10, utf8.encode('<root/>')));
+    final zipBytesDoc = Uint8List.fromList(ZipEncoder().encode(archiveDoc)!);
+    final docZipFile = File('${tempDir.path}/leading_slash_docx.zip');
+    await docZipFile.writeAsBytes(zipBytesDoc);
+
+    // 2. PowerPoint ZIP with leading backslash
+    final archivePpt = Archive();
+    archivePpt.addFile(ArchiveFile('\\ppt\\presentation.xml', 10, utf8.encode('<root/>')));
+    final zipBytesPpt = Uint8List.fromList(ZipEncoder().encode(archivePpt)!);
+    final pptZipFile = File('${tempDir.path}/leading_backslash_pptx.zip');
+    await pptZipFile.writeAsBytes(zipBytesPpt);
+
+    // 3. Excel ZIP with mixed-case and leading slash
+    final archiveExcel = Archive();
+    archiveExcel.addFile(ArchiveFile('/xl/workbook.xml', 10, utf8.encode('<root/>')));
+    final zipBytesExcel = Uint8List.fromList(ZipEncoder().encode(archiveExcel)!);
+    final xlsxZipFile = File('${tempDir.path}/leading_slash_xlsx.zip');
+    await xlsxZipFile.writeAsBytes(zipBytesExcel);
+
+    try {
+      final analysisDoc = await FileIntelligenceEngine.analyze(docZipFile.path);
+      expect(analysisDoc.trueType, equals('Word Document (DOCX)'));
+      expect(analysisDoc.trueMimeType, equals('application/vnd.openxmlformats-officedocument.wordprocessingml.document'));
+
+      final analysisPpt = await FileIntelligenceEngine.analyze(pptZipFile.path);
+      expect(analysisPpt.trueType, equals('PowerPoint Presentation (PPTX)'));
+      expect(analysisPpt.trueMimeType, equals('application/vnd.openxmlformats-officedocument.presentationml.presentation'));
+
+      final analysisExcel = await FileIntelligenceEngine.analyze(xlsxZipFile.path);
+      expect(analysisExcel.trueType, equals('Excel Spreadsheet (XLSX)'));
+      expect(analysisExcel.trueMimeType, equals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'));
+    } finally {
+      if (await docZipFile.exists()) await docZipFile.delete();
+      if (await pptZipFile.exists()) await pptZipFile.delete();
+      if (await xlsxZipFile.exists()) await xlsxZipFile.delete();
+    }
+  });
 }
+
